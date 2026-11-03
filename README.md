@@ -33,11 +33,13 @@ Ao pressionar F5 com uma das opções ligadas, o mod mostra (uma vez) em inglês
 ## Instalar no Horizon Android
 
 1. Baixe **`free_look.hmod`**:
-   - na aba **Actions** → último run de *Build Free Look .hmod* → artefato
-     `free-look-hmod`; ou
-   - em **Releases**, se houver uma tag `v*`: o asset `free_look.hmod` tem uma
-     URL HTTPS direta, que é o formato que o launcher aceita para importar.
-   - Confira o SHA-256 com `SHA256SUMS.txt` do mesmo artefato.
+   - URL HTTPS direta (a que o launcher aceita em **Mods → Import**):
+     <https://github.com/jorginho11111/Free-look/releases/download/v1.0.0/free_look.hmod>
+   - ou na aba **Actions** → último run de *Build Free Look .hmod* → artefato
+     `free-look-hmod` (90 dias).
+   - SHA-256 da `v1.0.0`:
+     `04c974096d9ee9a1966d70a38ccb43cba5606ced7fd3cfd0c6ca732217c9eda0`
+     (confira com `SHA256SUMS.txt` do mesmo release/artefato).
 2. No launcher do Horizon Android: **Mods → Import** (URL HTTPS do release, ou
    **Import file** se você copiou o arquivo para o celular).
 3. **Installed → Free Look → Enable** (novos mods entram desligados).
