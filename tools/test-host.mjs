@@ -137,7 +137,9 @@ check('both off: no settings written', calls.set.length, 0);
 // --- turn Auto free look on ------------------------------------------------
 uiEvents.settingsOpened();
 uiEvents.select(2, 0);
-check('auto saved', calls.set.at(-1), ['auto_free_look', 'true']);
+check('auto saved', calls.set.slice(-2), [
+  ['auto_free_look', 'true'], ['shift_for_free_look', 'false'],
+]);
 check('auto label ON', label(2), 'Auto free look: ON');
 key('key-down', 'free_look'); frame();
 check('activation explains the limitation', calls.chat.at(-1),
@@ -148,6 +150,10 @@ check('status command', events.command('freelook', 'status').includes('state act
 check('status command names the gap', events.command('freelook', 'status').includes('camera control is unavailable'), true);
 
 // --- F5 again: smooth return and HUD cleared -------------------------------
+// Turn the player 90 degrees while free look is on. There is no pointer-delta
+// event in the API, so this is how the mock host creates a visible offset
+// between the camera (still at 0) and the player's direction (now 90).
+playerYaw = 90;
 key('key-up', 'free_look'); frame();
 key('key-down', 'free_look'); frame();
 check('returning state', events.command('freelook', 'status').includes('state returning'), true);
@@ -155,6 +161,7 @@ const clearBefore = calls.hudClear;
 key('key-up', 'free_look'); frames(90);
 check('smooth return finishes', events.command('freelook', 'status').includes('state off'), true);
 check('HUD cleared after return', calls.hudClear > clearBefore, true);
+playerYaw = 0;
 
 // --- Shift for free look: plain F5 stays vanilla ---------------------------
 uiEvents.settingsOpened();
