@@ -1,0 +1,13 @@
+[package]
+name = "horizon-mod-sdk"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+description = "Verbatim Horizon mod SDK from revision e7614d2197ebe9ffdaa75e1bbb432dc0ce855e70"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+wit-bindgen = { version = "0.60.0", default-features = false, features = ["macros", "realloc"] }

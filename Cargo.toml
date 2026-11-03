@@ -1,0 +1,27 @@
+[package]
+name = "free_look"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+description = "Free Look configuration/key mod for Horizon's sandboxed .hmod runtime (horizon:mods@0.1.0)"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Verbatim SDK from Horizon e7614d2 -- the same SDK the working Zoom .hmod uses.
+horizon-mod-sdk = { path = "vendor/horizon-mod-sdk" }
+# Pure Rust state machine, unit tested on the host.
+free-look-logic = { path = "crates/logic" }
+
+[workspace]
+members = ["crates/logic", "tools/componentize"]
+exclude = ["vendor/horizon-mod-sdk"]
+resolver = "2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+panic = "abort"
+strip = true

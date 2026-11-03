@@ -1,0 +1,10 @@
+[package]
+name = "free-look-logic"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+description = "Host-independent free-look state machine: F5 gating, vertical clamp and smooth return"
+
+[lib]
+path = "src/lib.rs"

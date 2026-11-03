@@ -1,0 +1,104 @@
+// The derived world this mod's component actually uses, written out for
+// reference. `wit_bindgen` in the vendored SDK generates against the full
+// `horizon-ui-mod` world (wit/horizon.wit); the linker keeps only the
+// interfaces the code calls, and wit_component::ComponentEncoder turns that
+// into this trimmed component. Every name and type below is copied verbatim
+// from wit/horizon.wit -- nothing here is invented.
+package horizon:mods@0.1.0;
+
+interface log {
+    enum level { debug, info, warn, error }
+    write: func(level: level, message: string);
+}
+
+interface game {
+    record player {
+        x: f64,
+        y: f64,
+        z: f64,
+        yaw: f32,
+        pitch: f32,
+        health: f32,
+        food: u32,
+        dimension: string,
+    }
+    get-player: func() -> option<player>;
+}
+
+interface chat {
+    show: func(text: string);
+}
+
+interface hud {
+    enum corner { top-left, top-right, bottom-left, bottom-right }
+    record line { text: string, color: u32 }
+    set-panel: func(corner: corner, lines: list<line>);
+    clear: func();
+}
+
+interface storage {
+    get: func(key: string) -> option<list<u8>>;
+    set: func(key: string, value: list<u8>) -> result<_, string>;
+    delete: func(key: string);
+}
+
+interface input {
+    record held-item { id: string, count: u32, slot: u32 }
+    record item-use { item: held-item, ticks: u32 }
+    variant event {
+        use-start(item-use),
+        use-stop(item-use),
+        key-down(string),
+        key-up(string),
+        wheel(f32),
+    }
+    register-key: func(name: string, label: string, key: string) -> result<_, string>;
+    poll: func() -> list<event>;
+    claim-wheel: func(on: bool);
+}
+
+interface ui {
+    record text-widget { id: u32, text: string, color: u32 }
+    record item-widget { id: u32, item: string, name: string }
+    record list-widget { id: u32, rows: list<string>, selected: option<u32> }
+    record button-widget { id: u32, label: string }
+    variant widget {
+        text(text-widget),
+        button(button-widget),
+        item(item-widget),
+        %list(list-widget),
+    }
+    set-settings: func(widgets: list<widget>);
+}
+
+interface events {
+    record registration {
+        commands: list<string>,
+        tick: bool,
+        frame: bool,
+        chat: bool,
+    }
+    init: func() -> result<registration, string>;
+    tick: func(tick: u64);
+    frame: func(seconds: f32);
+    command: func(name: string, args: string) -> result<option<string>, string>;
+    chat: func(text: string);
+}
+
+interface ui-events {
+    select: func(id: u32, row: u32);
+    closed: func();
+    settings-opened: func();
+}
+
+world free-look-mod {
+    import log;
+    import game;
+    import chat;
+    import hud;
+    import storage;
+    import input;
+    import ui;
+    export events;
+    export ui-events;
+}

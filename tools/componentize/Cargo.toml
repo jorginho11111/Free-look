@@ -1,0 +1,9 @@
+[package]
+name = "componentize"
+version = "1.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1"
+wit-component = "0.254"

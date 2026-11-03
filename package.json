@@ -1,0 +1,17 @@
+{
+  "name": "free-look-hmod",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Build verification and mock-host tests for the Free Look Horizon .hmod",
+  "scripts": {
+    "build": "bash tools/build.sh",
+    "verify": "node tools/verify.mjs mod.wasm",
+    "test": "node tools/test-host.mjs",
+    "package": "python3 tools/package.py"
+  },
+  "dependencies": {
+    "@bytecodealliance/jco": "1.41.0",
+    "@bytecodealliance/jco-transpile": "0.23.0"
+  }
+}

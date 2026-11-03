@@ -1,0 +1,11 @@
+id = "free_look"
+name = "Free Look"
+version = "1.0.0"
+description = "F5 free look settings and key handling for Horizon. English settings page, saved options, vertical limit and smooth return logic. Camera rotation itself needs a native Horizon API that this .hmod runtime does not offer; the mod says so in game."
+authors = []
+api = "0.1"
+side = "client"
+# Every interface mod.wasm imports needs its capability here.
+capabilities = ["game-read", "chat", "hud", "storage", "ui", "input"]
+# ui and input are experimental in this API version.
+experimental = ["ui", "input"]

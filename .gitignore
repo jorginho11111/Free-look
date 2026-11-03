@@ -1,0 +1,10 @@
+# Build output (keep the repository source-only)
+/target/
+node_modules/
+.arena/
+mod.wasm
+*.hmod
+SHA256SUMS.txt
+.free-look-*.tmp
+__pycache__/
+*.pyc
