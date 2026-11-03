@@ -90,7 +90,57 @@ Ou seja: mesmo um `.hnmod` no desktop precisaria de um hook novo. A
 especificação completa do que pedir/implementar está em
 [`NATIVE-API-PROPOSAL.md`](NATIVE-API-PROPOSAL.md).
 
-## 6. O que este repositório entrega, então
+## 6. Existe alguma versão em que a câmera é suportada?
+
+**Em `.hmod` (sandboxed): não, em nenhuma versão.** A lista fechada de funções
+de `horizon:mods@0.1.0` ([`reference/e7614d2/api_level.rs`](../reference/e7614d2/api_level.rs),
+níveis 0–7) nunca teve um setter de câmera, e a referência gerada mais recente
+do Android (dev 1013, `docs/api/mods-reference.md` do fork JAK) continua com
+apenas `render.shake` e `render.set-zoom` relacionados à câmera. A API de mods
+só **ganha** funções; não existe uma revisão antiga com um `set-camera`
+escondido. O fork WASM mais ambicioso — `Stink-O/horizon`,
+[`orbital-mod-api-10` (03/11/2026)](https://github.com/Stink-O/horizon/releases/tag/orbital-mod-api-10) —
+acrescenta um *post pass* WGSL que **lê** a câmera e `world.carry-player`
+(que gira **o jogador**, até ±6°/tick), mas também não define ângulos de
+câmera, não entrega delta de mouse e não consome teclas.
+
+**Em `.hnmod` (native): sim.** Um mod nativo é Rust injetado no código do jogo
+por `horizon-mixins`, então ele pode patchar diretamente
+`Game::apply_mouse_look` e `perspective::Game::camera_view`. Já existe um mod
+assim no registro oficial:
+
+| Mod | Entrega | Observações |
+| --- | --- | --- |
+| [Freelook 0.3.1](https://playhorizon.dev/mods/freelook) — Krzysix17, 31/10/2026, MIT, pin `a491181` | [`.hnmod` (5,7 KB)](https://github.com/horizon-rust/horizon-mods/releases/download/freelook-0.3.1/freelook-0.3.1.hnmod), [código-fonte](https://github.com/Krzysix17/horizon-freelook) | Segura **X** (revinculável em Options > Mods) para uma câmera em terceira pessoa que gira com o mouse sem mudar o olhar/movimento do personagem; a roda muda a distância; soltar volta. |
+| `freecam`, `freecam_plus`, `fair_freecam` (registro oficial) | `.hnmod` | Câmera que **sai do corpo** e voa com WASD; são freecam, não free look em órbita do personagem. |
+
+Diferenças em relação ao que foi pedido aqui: o Freelook é *hold* (não é F5
+toggle), não tem as opções "Auto free look"/"Shift for free look", não
+persiste configurações além do rebind de tecla, e o retorno é instantâneo
+(não suave). O clamp vertical é o do vanilla (±90°) em vez de ±80°. O código é
+MIT, então dá para adaptar — veja [`NATIVE-API-PROPOSAL.md`](NATIVE-API-PROPOSAL.md).
+
+**No Android:** o APK oficial (`Vasysik/horizon-android`) **não compila
+`.hnmod`**. O fork `JAK-cool162/horizon-android` (dev 1009+, hoje 1013) tem
+*Import .hnmod* e **Build APK on your fork** (ou o workflow "Android dev APKs"
+com o input `native_mods`), com `--allow-version-mismatch` para mods pinados em
+outro commit; leva ~40–70 min e gera um APK dev. Verificamos que as duas
+funções que o Freelook hooka (`Game::apply_mouse_look` e
+`perspective::Game::camera_view`) **ainda existem com a mesma assinatura** no
+fonte desse fork, e o módulo é injetado em `crates/horizon-client/src/game.rs`
+(biblioteca compilada no Android, não `main.rs`), então não cai na regra
+"Desktop only". Ainda assim **não é garantido**: o pin `a491181` é de outro
+commit e o `horizon-mixins` pode recusar algum alvo.
+
+**No upstream atual (desktop):** `native-hooks.json` tem `camera_shake`
+(rotação aditiva, limitada a ~10°) e `camera_distance` (distância em terceira
+pessoa), ambos `listen`; há um fragmento pendente `camera_read` para **ler**
+as matrizes. `ViewportEvent.ComputeCameraAngles` segue "Not started" no
+[issue #4953](https://github.com/horizon-rust/horizon/issues/4953). Ou seja:
+nem os hook points nativos dão os ângulos — o Freelook funciona porque usa
+injeções `HEAD` canceláveis em funções internas, não uma API pública.
+
+## 7. O que este repositório entrega, então
 
 Um `.hmod` **que carrega** (mesma estrutura, SDK, WIT, manifesto, registro de
 teclas e tela de configurações do Zoom que já funciona) e que implementa

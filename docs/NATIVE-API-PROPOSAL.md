@@ -1,11 +1,44 @@
 # Alternativa: como o Free Look real pode existir no Horizon Android
 
-> Tudo neste arquivo é **proposta de API nova**. Nenhuma das funções/hooks
-> abaixo existe hoje; elas são o contrato que um `.hnmod` nativo teria de
-> implementar para que o `.hmod` deste repositório passe a girar a câmera.
-> O `.hmod` entregue **não** chama nada disso.
+> As funções/hooks `freelook.*` descritos abaixo são **proposta de API nova** —
+> o `.hmod` entregue **não** chama nada disso. Mas o trabalho nativo não
+> precisa começar do zero: existe um `.hnmod` MIT pronto que já controla a
+> câmera (seção "Atalho" abaixo).
 
-## Caminho recomendado: `.hnmod` + mod bridge + APK de um fork
+## Atalho recomendado: adaptar o Freelook 0.3.1 existente
+
+Em vez de escrever os hooks de câmera do zero, partir do
+[`Krzysix17/horizon-freelook`](https://github.com/Krzysix17/horizon-freelook)
+(MIT, `.hnmod` 0.3.1 no registro oficial, pin `a491181`), que já injeta
+`HEAD` cancelável em `Game::apply_mouse_look` e
+`perspective::Game::camera_view` para girar a câmera sem girar o jogador. Para
+chegar ao comportamento pedido, as mudanças são pequenas e localizadas:
+
+1. **Reempacotar/repinar** o `.hnmod` para o commit do APK Android que você for
+   usar (`python3 tools/android_native_mods.py pack` no fork JAK, ou
+   `--allow-version-mismatch` no build). As duas funções alvo existem no fonte
+   atual do fork.
+2. **F5 em vez de X, e toggle em vez de hold:** `key.rs` já usa
+   `native_mod_key(id, "freelook", default)`; trocar o default para
+   `key.keyboard.f5` e trocar o estado `held` por um toggle. Como é código
+   nativo, dá para impedir que o F5 vanilla troque a perspectiva (o que a API
+   sandboxed não permite).
+3. **"Auto free look" / "Shift for free look" persistidas:** usar
+   `native_setting` / `native_set_setting` e `native_settings` /
+   `native_settings_click` (hooks nativos existentes) para a página em inglês.
+4. **Retorno suave e limite ±80°:** `native_frame(elapsed)` já existe; aplicar
+   a mesma máquina de estados de `crates/logic` (ou a lógica equivalente em
+   Rust) ao `look` do mod, em vez do snap-back atual.
+5. **Opcional — manter este `.hmod`:** publicar uma API de bridge `freelook`
+   nesse `.hnmod` (`enable`, `set_view`, `disable`, evento `pointer`) e deixar
+   que o `.hmod` deste repositório continue dono das configurações, trocando
+   apenas `src/camera.rs`. É o contrato detalhado na seção abaixo.
+
+No desktop, o mesmo `.hnmod` instala pelo launcher (Mods → nativo) e roda na
+instância "Native mods". No Android, só com APK de fork (Build APK / workflow
+`native_mods`), nunca com o `.hmod` isolado.
+
+## Caminho alternativo: escrever a API nativa do zero + mod bridge + APK de um fork
 
 Modelo oficial do Horizon Android (guia de mods 0.7.8 dev 1009):
 

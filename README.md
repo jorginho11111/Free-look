@@ -13,6 +13,17 @@
 > exata estão em [`docs/API-LIMITATIONS.md`](docs/API-LIMITATIONS.md) e
 > [`docs/NATIVE-API-PROPOSAL.md`](docs/NATIVE-API-PROPOSAL.md).
 
+**Existe alguma versão com câmera suportada?** Para `.hmod`, **não** — em
+nenhuma versão da API sandboxed. Para `.hnmod` nativo, **sim**: o registro
+oficial tem o [Freelook 0.3.1](https://playhorizon.dev/mods/freelook)
+(Krzysix17, MIT, 31/10/2026, Horizon `a491181`), que faz exatamente a câmera
+livre via mixins, além de `freecam`/`freecam_plus`/`fair_freecam`. No desktop
+ele instala pelo launcher; no Android exige um APK de fork (`JAK-cool162`) com
+**Build APK**, porque o APK oficial não compila `.hnmod`. Detalhes e o plano
+para adaptá-lo ao F5/às suas configurações estão em
+[`docs/API-LIMITATIONS.md` §6](docs/API-LIMITATIONS.md) e
+[`docs/NATIVE-API-PROPOSAL.md`](docs/NATIVE-API-PROPOSAL.md).
+
 ## O que o mod faz hoje
 
 | Pedido | Situação |
